@@ -1,0 +1,24 @@
+# JetBrains IDEs
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+
+# Environment files
+.env
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# OS-specific
+.DS_Store
+Thumbs.db
