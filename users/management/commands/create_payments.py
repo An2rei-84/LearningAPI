@@ -26,7 +26,11 @@ class Command(BaseCommand):
         users_to_create = [
             {"email": "user1@example.com", "first_name": "Иван", "last_name": "Иванов"},
             {"email": "user2@example.com", "first_name": "Петр", "last_name": "Петров"},
-            {"email": "user3@example.com", "first_name": "Анна", "last_name": "Сидорова"},
+            {
+                "email": "user3@example.com",
+                "first_name": "Анна",
+                "last_name": "Сидорова",
+            },
         ]
         test_users = []
         for user_data in users_to_create:
@@ -93,7 +97,9 @@ class Command(BaseCommand):
         # Платежи за уроки
         for user in test_users:
             for lesson in test_lessons:
-                if random.random() > 0.5:  # Некоторые уроки могут быть оплачены отдельно
+                if (
+                    random.random() > 0.5
+                ):  # Некоторые уроки могут быть оплачены отдельно
                     payment_date = now - timedelta(days=random.randint(1, 30))
                     payment = Payment.objects.create(
                         user=user,

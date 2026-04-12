@@ -1,6 +1,7 @@
 """
 Сериализаторы для моделей Course и Lesson в приложении LMS.
 """
+
 from rest_framework import serializers
 
 from lms.models import Course, Lesson
@@ -10,6 +11,8 @@ class LessonSerializer(serializers.ModelSerializer):
     """
     Сериализатор для модели Lesson.
     """
+
+    owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Lesson
@@ -24,7 +27,10 @@ class LessonInCourseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Lesson
-        exclude = ("course",)
+        exclude = (
+            "course",
+            "owner",
+        )
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -36,6 +42,7 @@ class CourseSerializer(serializers.ModelSerializer):
     lesson_count = serializers.SerializerMethodField()
     # Добавляем поле для вывода списка уроков, связанных с курсом
     lessons = LessonInCourseSerializer(many=True, read_only=True)
+    owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Course
@@ -46,6 +53,7 @@ class CourseSerializer(serializers.ModelSerializer):
             "description",
             "lesson_count",
             "lessons",
+            "owner",
         )
 
     def get_lesson_count(self, obj):

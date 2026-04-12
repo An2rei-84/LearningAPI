@@ -1,6 +1,7 @@
 """
 Фильтры для моделей приложения пользователей.
 """
+
 import django_filters
 from users.models import Payment
 
@@ -18,9 +19,7 @@ class PaymentFilter(django_filters.FilterSet):
     paid_lesson = django_filters.CharFilter(
         field_name="paid_lesson__title", lookup_expr="icontains"
     )
-    payment_method = django_filters.ChoiceFilter(
-        choices=Payment.PAYMENT_METHOD_CHOICES
-    )
+    payment_method = django_filters.ChoiceFilter(choices=Payment.PAYMENT_METHOD_CHOICES)
     # Сортировка по дате оплаты
     order_by_field = "payment_date"
 
