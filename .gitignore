@@ -22,3 +22,6 @@ build/
 # OS-specific
 .DS_Store
 Thumbs.db
+
+# Django specific
+db.sqlite3
