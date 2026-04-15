@@ -15,6 +15,7 @@ psycopg2-binary = "^2.9.9"
 pillow = "^10.3.0"
 python-dotenv = "^1.0.1"
 django-filter = "^24.2"
+djangorestframework-simplejwt = "^5.5.1"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^7.0.0"
