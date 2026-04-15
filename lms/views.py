@@ -3,11 +3,15 @@ API-представления (Views) для моделей Course и Lesson в
 """
 
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated  # Добавлено
-from lms.permissions import IsModerator, IsOwner  # Добавлено
+from rest_framework.permissions import IsAuthenticated
+from lms.permissions import IsModerator, IsOwner
 
-from lms.models import Course, Lesson
+from lms.models import Course, Lesson, Subscription
 from lms.serializers import CourseSerializer, LessonSerializer
+from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from lms.paginators import CustomPagination
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -17,10 +21,10 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
+    pagination_class = CustomPagination
 
     def get_queryset(self):
-        # Если пользователь не модератор, показывать только его курсы
-        if not self.request.user.groups.filter(name="moderators").exists():
+        if self.action == "list" and not self.request.user.groups.filter(name="moderators").exists():
             return Course.objects.filter(owner=self.request.user)
         return Course.objects.all()
 
@@ -54,10 +58,10 @@ class LessonViewSet(viewsets.ModelViewSet):  # Изменено с Generic API V
 
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
+    pagination_class = CustomPagination
 
     def get_queryset(self):
-        # Если пользователь не модератор, показывать только его уроки
-        if not self.request.user.groups.filter(name="moderators").exists():
+        if self.action == "list" and not self.request.user.groups.filter(name="moderators").exists():
             return Lesson.objects.filter(owner=self.request.user)
         return Lesson.objects.all()
 
@@ -82,3 +86,32 @@ class LessonViewSet(viewsets.ModelViewSet):  # Изменено с Generic API V
         else:
             self.permission_classes = [IsAuthenticated]  # Дефолтное разрешение
         return [permission() for permission in self.permission_classes]
+
+
+class SubscriptionAPIView(APIView):
+    """
+    API-представление для управления подпиской на курс.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, *args, **kwargs):
+        """
+        Метод для создания/удаления подписки.
+        """
+        user = self.request.user
+        course_id = self.request.data.get("course_id")
+        course_item = get_object_or_404(Course, pk=course_id)
+
+        subs_item = Subscription.objects.filter(user=user, course=course_item)
+
+        # Если подписка у пользователя на этот курс есть - удаляем ее
+        if subs_item.exists():
+            subs_item.delete()
+            message = "подписка удалена"
+        # Если подписки у пользователя на этот курс нет - создаем ее
+        else:
+            Subscription.objects.create(user=user, course=course_item)
+            message = "подписка добавлена"
+        # Возвращаем ответ в API
+        return Response({"message": message})

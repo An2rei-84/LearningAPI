@@ -81,3 +81,31 @@ class Lesson(models.Model):
         Возвращает строковое представление урока.
         """
         return f"{self.title} ({self.course.title})"
+
+
+class Subscription(models.Model):
+    """
+    Модель подписки пользователя на курс.
+    """
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="subscriptions",
+        verbose_name="пользователь",
+    )
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name="subscriptions",
+        verbose_name="курс",
+    )
+
+    class Meta:
+        verbose_name = "подписка"
+        verbose_name_plural = "подписки"
+        # Пользователь может подписаться на курс только один раз
+        unique_together = ("user", "course")
+
+    def __str__(self):
+        return f"{self.user} подписан на {self.course}"
