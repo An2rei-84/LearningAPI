@@ -10,9 +10,18 @@ API позволяет управлять курсами, уроками, пол
 *   **Django 5.0+**
 *   **Django REST Framework**
 *   **djangorestframework-simplejwt** для JWT-аутентификации
+*   **drf-spectacular** для документации API
+*   **Stripe** для обработки платежей
 *   **PostgreSQL**
 *   **Poetry** для управления зависимостями
 *   **django-filter** для фильтрации
+
+## Документация API
+
+Проект использует `drf-spectacular` для автоматической генерации документации OpenAPI.
+
+*   **Swagger UI:** `http://127.0.0.1:8000/api/docs/`
+*   **Schema JSON:** `http://127.0.0.1:8000/api/schema/`
 
 ## Установка и запуск проекта
 
@@ -24,14 +33,21 @@ API позволяет управлять курсами, уроками, пол
 
 2.  **Создайте и настройте `.env` файл:**
     *   Создайте файл `.env` в корне проекта.
-    *   Заполните его необходимыми данными:
+    *   Заполните его необходимыми данными для базы данных и Stripe:
         ```ini
+        # Django
         SECRET_KEY=<your-django-secret-key>
+        
+        # PostgreSQL
         DB_NAME=your_db_name
         DB_USER=postgres
         DB_PASSWORD=<your-db-password>
         DB_HOST=localhost
         DB_PORT=5432
+
+        # Stripe
+        STRIPE_SECRET_KEY=sk_test_...
+        STRIPE_API_KEY=pk_test_...
         ```
 
 3.  **Установите зависимости:**
@@ -93,9 +109,12 @@ API использует JWT для аутентификации.
 ### Курсы и Уроки
 *   `/api/courses/` - CRUD для курсов.
 *   `/api/lessons/` - CRUD для уроков.
+*   `POST /api/subscriptions/` - Подписка/отписка от курса.
 
 ### Платежи
 *   `GET /api/payments/` - Список платежей с возможностью фильтрации.
+*   `POST /api/payments/create/` - Создание платежа для курса и получение ссылки на оплату в Stripe.
+*   `GET /api/payments/{id}/` - Получение информации о конкретном платеже, включая статус оплаты из Stripe.
 
 ## Ролевая модель
 
