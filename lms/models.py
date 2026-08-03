@@ -27,6 +27,9 @@ class Course(models.Model):
         related_name="courses",
         verbose_name="владелец",
     )
+    price = models.DecimalField(
+        max_digits=10, decimal_places=2, default=10000.00, verbose_name="цена"
+    )
 
     class Meta:
         verbose_name = "курс"
