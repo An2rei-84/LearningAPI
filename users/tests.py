@@ -81,8 +81,15 @@ class PaymentCreateTestCase(UserBaseTestCase):
         # Проверяем вызовы Stripe API
         mock_product_create.assert_called_once_with(name=self.course.title)
         mock_price_create.assert_called_once_with(product="prod_test_id", unit_amount=int(self.course.price * 100), currency="rub")
+
+        # Получаем созданный платеж для проверки URL
+        payment = Payment.objects.get(paid_course=self.course, user=self.user)
+        expected_success_url = f"http://testserver/api/payments/{payment.pk}/"
+        expected_cancel_url = "http://testserver/api/payments/"
+
         mock_session_create.assert_called_once_with(
-            success_url="https://example.com/success",
+            success_url=expected_success_url,
+            cancel_url=expected_cancel_url,
             line_items=[{"price": "price_test_id", "quantity": 1}],
             mode="payment",
         )

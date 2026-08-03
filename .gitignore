@@ -25,3 +25,10 @@ Thumbs.db
 
 # Django specific
 db.sqlite3
+
+# Claude personal rules
+CLAUDE.md
+
+# Celery logs and pids
+*.log
+*.pid
