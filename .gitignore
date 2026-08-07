@@ -25,6 +25,13 @@ Thumbs.db
 
 # Django specific
 db.sqlite3
+media/
+staticfiles/
+
+# Coverage
+.coverage
+coverage_report.txt
+htmlcov/
 
 # Claude personal rules
 CLAUDE.md
