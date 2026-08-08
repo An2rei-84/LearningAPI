@@ -39,3 +39,4 @@ CLAUDE.md
 # Celery logs and pids
 *.log
 *.pid
+.env.production

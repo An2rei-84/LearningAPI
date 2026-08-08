@@ -206,3 +206,128 @@ API использует JWT для аутентификации.
 *   **Обычные пользователи:** Могут создавать, просматривать, редактировать и удалять только *свои* курсы и уроки.
 *   **Модераторы:** Могут просматривать и редактировать *любые* курсы и уроки, но не могут их создавать или удалять. Назначение в группу "moderators" производится через админ-панель.
 *   **Суперпользователи:** Имеют полный доступ через админ-панель.
+
+---
+
+## CI/CD и Деплой на сервер
+
+### GitHub Actions Workflow
+
+Проект использует GitHub Actions для автоматического тестирования и деплоя.
+
+**Workflow запускается:**
+- При каждом `push` в ветки `main` и `feature`
+- При создании Pull Request в `main`
+
+**Этапы workflow:**
+1. **Test** — запуск тестов проекта
+2. **Lint** — проверка кода (Black, Flake8)
+3. **Build** — сборка Docker образа
+4. **Deploy** — деплой на сервер (только при push в `main`)
+
+### GitHub Secrets
+
+Для работы деплоя необходимо создать Secrets в репозитории:
+
+**Settings → Secrets and variables → Actions → New repository secret**
+
+| Secret name | Описание | Пример значения |
+|-------------|----------|------------------|
+| `SSH_PRIVATE_KEY` | Приватный SSH ключ для подключения к серверу | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
+| `SERVER_HOST` | IP адрес сервера | `144.124.249.130` |
+| `SERVER_USER` | Пользователь SSH | `root` |
+| `SECRET_KEY` | Django секретный ключ | `django-insecure-...` |
+| `ALLOWED_HOSTS` | Разрешённые хосты | `example.com,www.example.com` |
+| `DB_NAME` | Имя базы данных | `lms_db` |
+| `DB_USER` | Пользователь БД | `postgres` |
+| `DB_PASSWORD` | Пароль БД | `secure_password` |
+| `STRIPE_SECRET_KEY` | Stripe секретный ключ | `sk_test_...` |
+| `STRIPE_PUBLIC_KEY` | Stripe публичный ключ | `pk_test_...` |
+
+### Настройка сервера
+
+**Требования:**
+- Ubuntu 20.04+ / Debian 11+
+- Docker и Docker Compose
+- SSH доступ
+
+**Установка Docker на Ubuntu:**
+```bash
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo usermod -aG docker $USER
+```
+
+**SSH ключи для GitHub Actions:**
+```bash
+# На сервере
+ssh-keygen -t ed25519 -C "github-actions" -f ~/.ssh/github_actions
+cat ~/.ssh/github_actions.pub >> ~/.ssh/authorized_keys
+cat ~/.ssh/github_actions  # Скопировать и добавить в GitHub Secrets
+```
+
+**Развертывание на сервере:**
+```bash
+# Клонирование репозитория
+git clone -b feature <your-repo-url> ~/app
+cd ~/app
+
+# Создание .env файла
+cp .env.template .env
+nano .env  # Заполнить реальными значениями
+
+# Запуск
+docker compose build
+docker compose up -d
+```
+
+### Создание Pull Request
+
+1. Создай ветку для изменений:
+   ```bash
+   git checkout -b feature/my-changes
+   ```
+
+2. Внеси изменения и закоммить:
+   ```bash
+   git add .
+   git commit -m "Описание изменений"
+   git push origin feature/my-changes
+   ```
+
+3. Создай Pull Request в GitHub:
+   - Base: `main`
+   - Compare: `feature/my-changes`
+
+4. После прохождения тестов — смёрджи в `main` для автоматического деплоя.
+
+---
+
+## Структура проекта
+
+```
+LearningAPI/
+├── .github/
+│   └── workflows/
+│       └── deploy.yml          # GitHub Actions workflow
+├── config/                     # Django конфигурация
+│   ├── settings.py            # Основные настройки
+│   ├── celery.py              # Celery конфигурация
+│   └── urls.py                # Root URL конфиг
+├── lms/                       # Приложение курсов
+│   ├── models.py              # Модели Course, Lesson, Subscription
+│   ├── serializers.py         # DRF сериализаторы
+│   ├── views.py               # API ViewSets
+│   └── permissions.py         # Кастомные разрешения
+├── users/                     # Приложение пользователей
+│   ├── models.py              # Модель User, Payment
+│   ├── serializers.py         # DRF сериализаторы
+│   ├── views.py               # API ViewSets
+│   └── tasks.py               # Celery задачи
+├── Dockerfile                  # Docker образ для приложения
+├── docker-compose.yml          # Docker Compose конфигурация
+├── nginx.conf                 # Nginx reverse proxy конфигурация
+├── requirements.txt           # Python зависимости
+├── .env.template             # Шаблон переменных окружения
+└── README.md                 # Этот файл
+```

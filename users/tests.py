@@ -41,7 +41,9 @@ class UserBaseTestCase(APITestCase):
 
         # URL-адреса для API
         self.payment_create_url = reverse("users:payment_create")
-        self.payment_retrieve_url = lambda pk: reverse("users:payment_retrieve", args=[pk])
+        self.payment_retrieve_url = lambda pk: reverse(
+            "users:payment_retrieve", args=[pk]
+        )
 
 
 class PaymentCreateTestCase(UserBaseTestCase):
@@ -52,7 +54,9 @@ class PaymentCreateTestCase(UserBaseTestCase):
     @patch("stripe.Product.create")
     @patch("stripe.Price.create")
     @patch("stripe.checkout.Session.create")
-    def test_payment_create_stripe(self, mock_session_create, mock_price_create, mock_product_create):
+    def test_payment_create_stripe(
+        self, mock_session_create, mock_price_create, mock_product_create
+    ):
         """
         Тест успешного создания платежа через Stripe.
         """
@@ -60,7 +64,9 @@ class PaymentCreateTestCase(UserBaseTestCase):
         mock_product_create.return_value.id = "prod_test_id"
         mock_price_create.return_value.id = "price_test_id"
         mock_session_create.return_value.id = "cs_test_id"
-        mock_session_create.return_value.url = "https://checkout.stripe.com/test_session"
+        mock_session_create.return_value.url = (
+            "https://checkout.stripe.com/test_session"
+        )
 
         self.client.force_authenticate(user=self.user)
         data = {"paid_course": self.course.id}
@@ -68,19 +74,28 @@ class PaymentCreateTestCase(UserBaseTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIn("stripe_payment_link", response.data)
-        self.assertEqual(response.data["stripe_payment_link"], "https://checkout.stripe.com/test_session")
+        self.assertEqual(
+            response.data["stripe_payment_link"],
+            "https://checkout.stripe.com/test_session",
+        )
 
         # Проверяем, что Payment объект был создан в нашей базе
         payment = Payment.objects.get(paid_course=self.course, user=self.user)
         self.assertIsNotNone(payment)
         self.assertEqual(payment.stripe_session_id, "cs_test_id")
-        self.assertEqual(payment.stripe_payment_link, "https://checkout.stripe.com/test_session")
+        self.assertEqual(
+            payment.stripe_payment_link, "https://checkout.stripe.com/test_session"
+        )
         self.assertEqual(payment.amount, self.course.price)
         self.assertEqual(payment.payment_method, "stripe")
 
         # Проверяем вызовы Stripe API
         mock_product_create.assert_called_once_with(name=self.course.title)
-        mock_price_create.assert_called_once_with(product="prod_test_id", unit_amount=int(self.course.price * 100), currency="rub")
+        mock_price_create.assert_called_once_with(
+            product="prod_test_id",
+            unit_amount=int(self.course.price * 100),
+            currency="rub",
+        )
 
         # Получаем созданный платеж для проверки URL
         payment = Payment.objects.get(paid_course=self.course, user=self.user)

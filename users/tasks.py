@@ -30,10 +30,7 @@ def block_inactive_users():
 
     # Выбираем пользователей, которые не входили более месяца
     # и ещё активны (чтобы не блокировать повторно)
-    inactive_users = User.objects.filter(
-        last_login__lt=month_ago,
-        is_active=True
-    )
+    inactive_users = User.objects.filter(last_login__lt=month_ago, is_active=True)
 
     # Батчевое обновление - блокируем всех выбранных пользователей
     count = inactive_users.update(is_active=False)

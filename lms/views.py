@@ -23,27 +23,27 @@ from datetime import timedelta
     methods={
         "list": extend_schema(
             summary="Получение списка курсов",
-            description="Возвращает список всех курсов. Обычные пользователи видят только свои курсы. Модераторы видят все курсы."  # noqa: E501
+            description="Возвращает список всех курсов. Обычные пользователи видят только свои курсы. Модераторы видят все курсы.",  # noqa: E501
         ),
         "create": extend_schema(
             summary="Создание нового курса",
-            description="Создает новый курс. Модераторы не могут создавать. Владелец устанавливается автоматически."  # noqa: E501
+            description="Создает новый курс. Модераторы не могут создавать. Владелец устанавливается автоматически.",  # noqa: E501
         ),
         "retrieve": extend_schema(
             summary="Получение информации о курсе",
-            description="Возвращает детальную информацию об одном курсе. Доступно владельцу и модераторам."
+            description="Возвращает детальную информацию об одном курсе. Доступно владельцу и модераторам.",
         ),
         "update": extend_schema(
             summary="Полное обновление курса",
-            description="Полностью обновляет информацию о курсе. Доступно владельцу и модераторам."
+            description="Полностью обновляет информацию о курсе. Доступно владельцу и модераторам.",
         ),
         "partial_update": extend_schema(
             summary="Частичное обновление курса",
-            description="Частично обновляет информацию о курсе. Доступно владельцу и модераторам."
+            description="Частично обновляет информацию о курсе. Доступно владельцу и модераторам.",
         ),
         "destroy": extend_schema(
             summary="Удаление курса",
-            description="Удаляет курс по его ID. Доступно только владельцу."
+            description="Удаляет курс по его ID. Доступно только владельцу.",
         ),
     },
 )
@@ -57,7 +57,10 @@ class CourseViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPagination
 
     def get_queryset(self):
-        if self.action == "list" and not self.request.user.groups.filter(name="moderators").exists():
+        if (
+            self.action == "list"
+            and not self.request.user.groups.filter(name="moderators").exists()
+        ):
             return Course.objects.filter(owner=self.request.user)
         return Course.objects.all()
 
@@ -88,6 +91,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 
         if should_notify:
             from lms.tasks import send_course_update_notification
+
             # Вызываем Celery задачу асинхронно
             send_course_update_notification.delay(course.id)
 
@@ -129,27 +133,27 @@ class CourseViewSet(viewsets.ModelViewSet):
     methods={
         "list": extend_schema(
             summary="Получение списка уроков",
-            description="Возвращает список всех уроков. Обычные пользователи видят только свои уроки. Модераторы видят все уроки."  # noqa: E501
+            description="Возвращает список всех уроков. Обычные пользователи видят только свои уроки. Модераторы видят все уроки.",  # noqa: E501
         ),
         "create": extend_schema(
             summary="Создание нового урока",
-            description="Создает новый урок. Модераторы не могут создавать. Владелец устанавливается автоматически."  # noqa: E501
+            description="Создает новый урок. Модераторы не могут создавать. Владелец устанавливается автоматически.",  # noqa: E501
         ),
         "retrieve": extend_schema(
             summary="Получение информации об уроке",
-            description="Возвращает детальную информацию об одном уроке по ID. Доступно владельцу и модераторам."
+            description="Возвращает детальную информацию об одном уроке по ID. Доступно владельцу и модераторам.",
         ),
         "update": extend_schema(
             summary="Полное обновление урока",
-            description="Полностью обновляет информацию об уроке по ID. Доступно владельцу и модераторам."
+            description="Полностью обновляет информацию об уроке по ID. Доступно владельцу и модераторам.",
         ),
         "partial_update": extend_schema(
             summary="Частичное обновление урока",
-            description="Частично обновляет информацию об уроке. Доступно владельцу и модераторам."
+            description="Частично обновляет информацию об уроке. Доступно владельцу и модераторам.",
         ),
         "destroy": extend_schema(
             summary="Удаление урока",
-            description="Удаляет урок по ID. Доступно только владельцу."
+            description="Удаляет урок по ID. Доступно только владельцу.",
         ),
     },
 )
@@ -163,7 +167,10 @@ class LessonViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPagination
 
     def get_queryset(self):
-        if self.action == "list" and not self.request.user.groups.filter(name="moderators").exists():
+        if (
+            self.action == "list"
+            and not self.request.user.groups.filter(name="moderators").exists()
+        ):
             return Lesson.objects.filter(owner=self.request.user)
         return Lesson.objects.all()
 
@@ -194,6 +201,7 @@ class LessonViewSet(viewsets.ModelViewSet):
 
         if should_notify:
             from lms.tasks import send_course_update_notification
+
             send_course_update_notification.delay(course.id)
 
         return response
@@ -259,7 +267,10 @@ class SubscriptionAPIView(APIView):
             200: {
                 "description": "Успешное выполнение",
                 "examples": [
-                    ("Подписка добавлена", {"value": {"message": "подписка добавлена"}}),  # noqa: E501
+                    (
+                        "Подписка добавлена",
+                        {"value": {"message": "подписка добавлена"}},
+                    ),  # noqa: E501
                     ("Подписка удалена", {"value": {"message": "подписка удалена"}}),
                 ],
             }
