@@ -103,8 +103,8 @@ DATABASES = {
             "client_encoding": "utf8",
         },
         "TEST": {
-            "NAME": BASE_DIR / "test_db.sqlite3",
-        }
+            "NAME": str(BASE_DIR / "test_db.sqlite3"),
+        },
     }
 }
 
