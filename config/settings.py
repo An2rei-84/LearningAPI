@@ -99,14 +99,20 @@ DATABASES = {
         ),  # Используем ваш пароль по умолчанию
         "HOST": os.getenv("DB_HOST", "localhost"),
         "PORT": os.getenv("DB_PORT", "5432"),
-        "OPTIONS": {
-            "client_encoding": "utf8",
-        },
         "TEST": {
             "NAME": str(BASE_DIR / "test_db.sqlite3"),
         },
     }
 }
+
+# Add PostgreSQL-specific options only for PostgreSQL
+if (
+    os.getenv("DB_ENGINE", "django.db.backends.postgresql")
+    == "django.db.backends.postgresql"
+):
+    DATABASES["default"]["OPTIONS"] = {
+        "client_encoding": "utf8",
+    }
 
 
 # Password validation
