@@ -106,7 +106,10 @@ DATABASES = {
 }
 
 # Add PostgreSQL-specific options only for PostgreSQL
-if os.getenv("DB_ENGINE", "django.db.backends.postgresql") == "django.db.backends.postgresql":
+if (
+    os.getenv("DB_ENGINE", "django.db.backends.postgresql")
+    == "django.db.backends.postgresql"
+):
     DATABASES["default"]["OPTIONS"] = {
         "client_encoding": "utf8",
     }
