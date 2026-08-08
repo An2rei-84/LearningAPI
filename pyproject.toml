@@ -18,6 +18,11 @@ django-filter = "^24.2"
 djangorestframework-simplejwt = "^5.5.1"
 drf-spectacular = "^0.29.0"
 stripe = "^15.0.1"
+gunicorn = "^21.2.0"
+celery = "^5.6.0"
+redis = "^5.0.0"
+django-celery-beat = "^2.9.0"
+django-redis = "^5.4.0"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^7.0.0"

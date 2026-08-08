@@ -5,7 +5,7 @@ API-представления (Views) для модели User в прилож�
 from rest_framework import viewsets, generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 
 from users.models import User, Payment
 from users.serializers import (
@@ -25,34 +25,54 @@ from users import services
 from lms.models import Course
 
 
-@extend_schema(tags=["Пользователи"],
-               description="Управление профилями пользователей. Предоставляет полный набор CRUD-операций.",
-               methods={
-                   'list': extend_schema(
-                       summary="Получение списка пользователей",
-                       description="Возвращает список всех зарегистрированных пользователей. Доступно только аутентифицированным пользователям."
-                   ),
-                   'create': extend_schema(
-                       summary="Регистрация нового пользователя",
-                       description="Позволяет зарегистрировать нового пользователя, указав email и пароль. Доступно всем, без аутентификации."
-                   ),
-                   'retrieve': extend_schema(
-                       summary="Получение информации о пользователе",
-                       description="Возвращает детальную информацию о пользователе по его ID. Если запрашивается собственный профиль, возвращается полная информация. При просмотре чужого профиля, возвращается публичная информация (без конфиденциальных полей). Доступно владельцу профиля и аутентифицированным пользователям."
-                   ),
-                   'update': extend_schema(
-                       summary="Полное обновление профиля пользователя",
-                       description="Полностью обновляет информацию о текущем пользователе по его ID. Доступно только владельцу профиля."
-                   ),
-                   'partial_update': extend_schema(
-                       summary="Частичное обновление профиля пользователя",
-                       description="Частично обновляет информацию о текущем пользователе по его ID. Доступно только владельцу профиля."
-                   ),
-                   'destroy': extend_schema(
-                       summary="Удаление профиля пользователя",
-                       description="Удаляет профиль текущего пользователя по его ID. Доступно только владельцу профиля."
-                   )
-               })
+@extend_schema(
+    tags=["Пользователи"],
+    description="Управление профилями пользователей. Предоставляет полный набор CRUD-операций.",
+    methods={
+        "list": extend_schema(
+            summary="Получение списка пользователей",
+            description=(
+                "Возвращает список всех зарегистрированных пользователей. "
+                "Доступно только аутентифицированным пользователям."
+            ),
+        ),
+        "create": extend_schema(
+            summary="Регистрация нового пользователя",
+            description=(
+                "Позволяет зарегистрировать нового пользователя, указав email и пароль. "
+                "Доступно всем, без аутентификации."
+            ),
+        ),
+        "retrieve": extend_schema(
+            summary="Получение информации о пользователе",
+            description=(
+                "Возвращает детальную информацию о пользователе по его ID. "
+                "Если запрашивается собственный профиль, возвращается полная информация. "
+                "При просмотре чужого профиля, возвращается публичная информация "
+                "(без конфиденциальных полей). "
+                "Доступно владельцу профиля и аутентифицированным пользователям."
+            ),
+        ),
+        "update": extend_schema(
+            summary="Полное обновление профиля пользователя",
+            description=(
+                "Полностью обновляет информацию о текущем пользователе по его ID. "
+                "Доступно только владельцу профиля."
+            ),
+        ),
+        "partial_update": extend_schema(
+            summary="Частичное обновление профиля пользователя",
+            description=(
+                "Частично обновляет информацию о текущем пользователе по его ID. "
+                "Доступно только владельцу профиля."
+            ),
+        ),
+        "destroy": extend_schema(
+            summary="Удаление профиля пользователя",
+            description="Удаляет профиль текущего пользователя по его ID. Доступно только владельцу профиля.",
+        ),
+    },
+)
 class UserViewSet(viewsets.ModelViewSet):
     """
     ViewSet для модели User, предоставляющий полный набор CRUD-операций
@@ -94,7 +114,10 @@ class UserViewSet(viewsets.ModelViewSet):
 @extend_schema(
     tags=["Платежи"],
     summary="Получение списка платежей",
-    description="Возвращает список всех платежей с возможностью фильтрации и сортировки. Доступно аутентифицированным пользователям.",
+    description=(
+        "Возвращает список всех платежей с возможностью фильтрации и сортировки. "
+        "Доступно аутентифицированным пользователям."
+    ),
     parameters=[
         OpenApiParameter(
             name="paid_course",
@@ -137,18 +160,24 @@ class PaymentListAPIView(generics.ListAPIView):
 @extend_schema(
     tags=["Платежи"],
     summary="Создание платежа для курса",
-    description="Создает платеж для указанного курса и инициирует процесс оплаты через Stripe. Возвращает объект платежа, содержащий ссылку на страницу оплаты Stripe.",
+    description=(
+        "Создает платеж для указанного курса и инициирует процесс оплаты через Stripe. "
+        "Возвращает объект платежа, содержащий ссылку на страницу оплаты Stripe."
+    ),
     request={
         "application/json": {
             "type": "object",
             "properties": {
-                "paid_course": {"type": "integer", "description": "ID курса, который будет оплачен."},
+                "paid_course": {
+                    "type": "integer",
+                    "description": "ID курса, который будет оплачен.",
+                },
             },
             "required": ["paid_course"],
         }
     },
     responses={
-        201: PaymentSerializer, # Ссылка на сериализатор для подробного ответа
+        201: PaymentSerializer,  # Ссылка на сериализатор для подробного ответа
         # Можно добавить дополнительные коды ошибок, если они обрабатываются
     },
 )
@@ -168,7 +197,9 @@ class PaymentCreateAPIView(generics.CreateAPIView):
         try:
             course = Course.objects.get(pk=course_id)
         except Course.DoesNotExist:
-            return Response({"error": "Курс не найден."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Курс не найден."}, status=status.HTTP_404_NOT_FOUND
+            )
 
         amount = course.price
 
@@ -181,11 +212,15 @@ class PaymentCreateAPIView(generics.CreateAPIView):
 
         stripe_product = services.create_stripe_product(course.title)
         stripe_price = services.create_stripe_price(stripe_product.id, payment.amount)
-        
-        success_url = self.request.build_absolute_uri(reverse('users:payment_retrieve', kwargs={'pk': payment.pk}))
-        cancel_url = self.request.build_absolute_uri(reverse('users:payment_list'))
 
-        stripe_session = services.create_stripe_session(stripe_price.id, success_url, cancel_url)
+        success_url = self.request.build_absolute_uri(
+            reverse("users:payment_retrieve", kwargs={"pk": payment.pk})
+        )
+        cancel_url = self.request.build_absolute_uri(reverse("users:payment_list"))
+
+        stripe_session = services.create_stripe_session(
+            stripe_price.id, success_url, cancel_url
+        )
 
         payment.stripe_session_id = stripe_session.id
         payment.stripe_payment_link = stripe_session.url
@@ -194,8 +229,12 @@ class PaymentCreateAPIView(generics.CreateAPIView):
 
 @extend_schema(
     tags=["Платежи"],
-    summary="Получение информации о платеже и его статусе",
-    description="Возвращает детальную информацию об одном платеже по его ID, включая актуальный статус платежа, полученный из Stripe. Доступно владельцу платежа.",
+    summary="Получение информацию о платеже и его статусе",
+    description=(
+        "Возвращает детальную информацию об одном платеже по его ID, "
+        "включая актуальный статус платежа, полученный из Stripe. "
+        "Доступно владельцу платежа."
+    ),
     responses={200: PaymentRetrieveSerializer},
 )
 class PaymentRetrieveAPIView(generics.RetrieveAPIView):

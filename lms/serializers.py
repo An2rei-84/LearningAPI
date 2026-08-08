@@ -14,7 +14,9 @@ class LessonSerializer(serializers.ModelSerializer):
     """
 
     owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    video_link = serializers.URLField(validators=[validate_youtube_link], required=False, allow_null=True)
+    video_link = serializers.URLField(
+        validators=[validate_youtube_link], required=False, allow_null=True
+    )
 
     class Meta:
         model = Lesson

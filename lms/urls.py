@@ -19,7 +19,11 @@ router.register(r"courses", CourseViewSet, basename="courses")
 router.register(r"lessons", LessonViewSet, basename="lessons")
 
 urlpatterns = [
-    path("subscriptions/toggle/", SubscriptionAPIView.as_view(), name="subscription_toggle"),
+    path(
+        "subscriptions/toggle/",
+        SubscriptionAPIView.as_view(),
+        name="subscription_toggle",
+    ),
 ]
 
 urlpatterns += router.urls
